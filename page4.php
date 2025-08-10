@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My House</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@500;700&family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<!-- Theme toggle + Back to top + Lightbox container -->
+<button class="theme-toggle" id="themeToggle" title="Toggle light/dark" aria-label="Toggle theme">🌓</button>
+<button id="backTop" title="Back to top" aria-label="Back to top">↑</button>
+
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <span class="close" id="lbClose" aria-label="Close">✕</span>
+  <img id="lbImg" alt="Preview">
+</div>
+<script>
+(function(){
+  // ===== Dark mode (saved in localStorage) =====
+  const root = document.documentElement;
+  const KEY = "site-theme";
+  const saved = localStorage.getItem(KEY);
+  if(saved === "dark") root.classList.add("dark");
+  const toggle = document.getElementById("themeToggle");
+  toggle && toggle.addEventListener("click", () => {
+    root.classList.toggle("dark");
+    localStorage.setItem(KEY, root.classList.contains("dark") ? "dark" : "light");
+  });
+
+  // ===== Back to top =====
+  const backTop = document.getElementById("backTop");
+  const onScroll = () => {
+    if (window.scrollY > 260) backTop.classList.add("show");
+    else backTop.classList.remove("show");
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  backTop && backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  // ===== Lightbox (delegate clicks for images in main & gallery) =====
+  const lb = document.getElementById("lightbox");
+  const lbImg = document.getElementById("lbImg");
+  const lbClose = document.getElementById("lbClose");
+  const openLB = (src, alt) => {
+    lbImg.src = src; lbImg.alt = alt || "Preview";
+    lb.classList.add("open"); lb.setAttribute("aria-hidden", "false");
+  };
+  const closeLB = () => {
+    lb.classList.remove("open"); lb.setAttribute("aria-hidden", "true");
+    lbImg.src = ""; lbImg.alt = "Preview";
+  };
+
+  document.addEventListener("click", (e) => {
+    const t = e.target;
+    // Mở khi click ảnh trong main, gallery hoặc ảnh có class img-3d
+    if (t && t.tagName === "IMG" && (t.closest("main") || t.classList.contains("img-3d"))) {
+      e.preventDefault();
+      openLB(t.src, t.alt);
+    }
+    // Đóng khi click nền tối hoặc nút X
+    if (t === lb || t === lbClose) closeLB();
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLB(); });
+
+  // Run once on load
+  onScroll();
+})();
+</script>
+<body>
+  <header>
+    <img src="images/logo.png" alt="My Logo" title="My Logo" class="logo">
+  </header>
+
+  <nav class="horizontal-menu" aria-label="Main navigation">
+    <ul>
+      <li><a href="index.html" title="Home">Home</a></li>
+      <li><a href="page1.html" title="My Study Subject">My Study Subject</a></li>
+      <li><a href="page2.html" title="My Hobbies">My Hobbies</a></li>
+      <li><a href="page3.html" title="My Music">My Music</a></li>
+      <li><a href="page4.php" title="My House">My House</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <aside class="sidebar" aria-label="News and external links">
+      <h3>News</h3>
+      <ul>
+        <li><a href="https://www.bbc.com" target="_blank" rel="noopener noreferrer" title="BBC News">BBC News</a></li>
+        <li><a href="https://www.cnn.com" target="_blank" rel="noopener noreferrer" title="CNN">CNN</a></li>
+        <li>
+          <a href="https://www.theverge.com" target="_blank" rel="noopener noreferrer" title="The Verge">
+            <img src="images/verge.jpg" alt="The Verge" title="The Verge" width="100">
+          </a>
+        </li>
+        <li>
+          <a href="https://www.techcrunch.com" target="_blank" rel="noopener noreferrer" title="TechCrunch">
+            <img src="images/techcrunch.jpeg" alt="TechCrunch" title="TechCrunch" width="100">
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main>
+      <h2>Information About My House</h2>
+
+      <?php
+        // Associative array dữ liệu căn nhà
+        $my_house = [
+          "Bedrooms"       => 2,
+          "Bathrooms"      => 2,
+          "Living Rooms"   => 1,
+          "Kitchen"        => "Modern with island",
+          "Street Address" => "Pyrmont St, Pyrmont, NSW, 2009",
+          "Has Garage"     => "Yes",
+          "Has Backyard"   => "Yes"
+        ];
+
+        // Hàm escape an toàn
+        function e($v) {
+          return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+        }
+      ?>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Feature</th>
+            <th scope="col">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($my_house as $key => $value): ?>
+            <tr>
+              <td><?= e($key) ?></td>
+              <td><?= e($value) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-icons">
+      <a href="mailto:dminh270603@gmail.com" title="Email">
+        <i class="fas fa-envelope" aria-hidden="true"></i>
+      </a>
+      <a href="tel:0400123456" title="Phone">
+        <i class="fas fa-phone" aria-hidden="true"></i>
+      </a>
+      <a href="https://www.instagram.com/_m1ntranf" target="_blank" rel="noopener noreferrer" title="Instagram">
+        <i class="fab fa-instagram" aria-hidden="true"></i>
+      </a>
+    </div>
+    <p>Website created: 07/08/2025</p>
+  </footer>
+</body>
+</html>
